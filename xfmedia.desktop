@@ -7,6 +7,6 @@ Exec=xfmedia
 Terminal=false
 Type=Application
 StartupNotify=true
-Categories=X-XFCE;AudioVideo;Player;
+Categories=X-XFCE;AudioVideo;AudioPlayer;VideoPlayer;
 Encoding=UTF-8
 # vi: encoding=utf-8
