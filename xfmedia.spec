@@ -9,8 +9,8 @@ Source0:	http://spuriousinterrupt.org/projects/xfmedia/files/%{name}-%{version}.
 # Source0-md5:	da83e30744b47fc034731fb160197470
 Source1:	%{name}.desktop
 URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
-BuildRequires:	autoconf
-BuildRequires:	automake
+BuildRequires:	autoconf >= 2.50
+BuildRequires:	automake >= 1.8
 BuildRequires:	gtk+2-devel >= 2:2.4.0
 BuildRequires:	libxfcegui4 >= 4.2.0
 BuildRequires:	xine-lib-devel
