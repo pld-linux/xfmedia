@@ -10,7 +10,7 @@ Source0:	http://spuriousinterrupt.org/projects/xfmedia/files/%{name}-%{version}.
 Source1:	%{name}.desktop
 URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 BuildRequires:	autoconf >= 2.50
-BuildRequires:	automake >= 1.8
+BuildRequires:	automake >= 1:1.8
 BuildRequires:	gtk+2-devel >= 2:2.4.0
 BuildRequires:	libxfcegui4 >= 4.2.0
 BuildRequires:	xine-lib-devel
@@ -32,7 +32,7 @@ ale, jako ¿e jest oparty na xine, obs³uguje równie¿ pliki wideo.
 Summary:	Xfmedia plugins
 Summary(pl):	Wtyczki dla Xfmedia
 Group:		X11/Application/Multimedia
-Requires:	%{name} >= %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description plugins
 Xfmedia plugins:
@@ -46,7 +46,7 @@ Wtyczki dla Xfmedia:
 Summary:	Header files for Xfmedia
 Summary(pl):	Pliki nag³ówkowe Xfmedia
 Group:		X11/Development/Libraries
-Requires:	%{name} >= %{version}-%{release}
+Requires:	%{name} = %{version}-%{release}
 
 %description devel
 Xfmedia - header files.
