@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Xfmedia
 Comment=Lightweight Media Player
-Comment(pl)=Lekki odtwarzacz multimedialny
+Comment[pl]=Lekki odtwarzacz multimedialny
 Exec=xfmedia
 #Icon=xfmedia.png
 Terminal=false
