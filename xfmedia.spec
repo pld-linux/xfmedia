@@ -3,7 +3,7 @@
 # - better description and summary
 
 Summary:	Xfmedia - lightweight media player based on the xine engine
-Summary(pl):	Xfmedia - lekki odtwarzacz multimedialny oparty na xine
+Summary(pl):	Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
 Name:		xfmedia
 Version:	0.6.0
 Release:	0.3
@@ -15,10 +15,10 @@ Source1:	%{name}.desktop
 URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 BuildRequires:	autoconf
 BuildRequires:	automake
-BuildRequires:	gtk+2-devel >= 2.4
+BuildRequires:	gtk+2-devel >= 2:2.4.0
 BuildRequires:	libxfcegui4 >= 4.2.0
 BuildRequires:	xine-lib-devel
-Requires:	gtk+2 >= 2.4
+Requires:	gtk+2 >= 2:2.4.0
 Requires:	libxfcegui4 >= 4.2.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -30,7 +30,7 @@ on xine, supports video as well.
 %description -l pl
 Xfmedia jest lekkim odtwarzaczem multimedialnym opartym o silnik xine.
 Interfejs GTK+ skupia siê na zarz±dzaniu i odtwarzaniu plików audio,
-ale, bêd±c opartym na xine, wspiera równie¿ pliki wideo.
+ale, jako ¿e jest oparty na xine, obs³uguje równie¿ pliki wideo.
 
 %package plugins
 Summary:	Xfmedia plugins
@@ -54,7 +54,7 @@ Requires:	%{name} >= %{version}-%{release}
 Xfmedia header files.
 
 %description devel -l pl
-PLiki nag³ówkowe Xfmedia.
+Pliki nag³ówkowe Xfmedia.
 
 %prep
 %setup -q
@@ -80,16 +80,18 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README* TODO
 %attr(755,root,root) %{_bindir}/*
+%dir %{_libdir}/%{name}
+%dir %{_libdir}/%{name}/plugins
 %config(noreplace) %verify(not md5 mtime size) /etc/xdg/%{name}/*
-%{_datadir}/icons/hicolor/48x48/apps/*
-%{_datadir}/icons/hicolor/22x22/actions/*
+%{_iconsdir}/hicolor/48x48/apps/*
+%{_iconsdir}/hicolor/22x22/actions/*
 %{_desktopdir}/*
 
 %files plugins
 %defattr(644,root,root,755)
-%{_libdir}/%{name}/plugins/*.so
+%attr(755,root,root) %{_libdir}/%{name}/plugins/*.so
 
 %files devel
 %defattr(644,root,root,755)
-%{_includedir}/%{name}/*.h
-%{_libdir}/pkgconfig/*
+%{_includedir}/%{name}
+%{_pkgconfigdir}/*
