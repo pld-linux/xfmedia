@@ -17,6 +17,7 @@ URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 %{?with_dbus:BuildRequires:	dbus-devel >= 0.23}
 BuildRequires:	gtk+2-devel >= 2:2.4.0
 BuildRequires:	libxfcegui4 >= 4.2.0
+BuildRequires:	libxfce4util >= 4.2.0
 BuildRequires:	xine-lib-devel
 Requires:	gtk+2 >= 2:2.4.0
 Requires:	libxfcegui4 >= 4.2.0
