@@ -1,16 +1,20 @@
+#
+%bcond_without	dbus
+#
 Summary:	Xfmedia - lightweight media player based on the xine engine
 Summary(pl):	Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
 Name:		xfmedia
-Version:	0.6.0
+Version:	0.7.1
 Release:	1
 License:	GPL v2
 Group:		X11/Applications/Multimedia
 Source0:	http://spuriousinterrupt.org/projects/xfmedia/files/%{name}-%{version}.tar.bz2
-# Source0-md5:	da83e30744b47fc034731fb160197470
+# Source0-md5:	15f215810dd0d2b477992154945c5cfc
 Source1:	%{name}.desktop
 URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
-BuildRequires:	autoconf >= 2.50
-BuildRequires:	automake >= 1:1.8
+#BuildRequires:	autoconf >= 2.50
+#BuildRequires:	automake >= 1:1.8
+%{?with_dbus:BuildRequires:	dbus-devel >= 0.23}
 BuildRequires:	gtk+2-devel >= 2:2.4.0
 BuildRequires:	libxfcegui4 >= 4.2.0
 BuildRequires:	xine-lib-devel
@@ -58,10 +62,12 @@ Xfmedia - pliki nag³ówkowe.
 %setup -q
 
 %build
-%{__aclocal} -I m4
-%{__autoconf}
-%{__automake}
-%configure
+#%{__aclocal} -I m4
+#%{__autoconf}
+#%{__automake}
+%configure \
+	--disable-static \
+	%{!?with_dbus: --disable-dbus}
 %{__make}
 
 %install
@@ -77,13 +83,23 @@ rm -rf $RPM_BUILD_ROOT
 %files
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README* TODO
+%config(noreplace) %verify(not md5 mtime size) /etc/xdg/%{name}/*
 %attr(755,root,root) %{_bindir}/*
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
-%config(noreplace) %verify(not md5 mtime size) /etc/xdg/%{name}/*
 %{_iconsdir}/hicolor/48x48/apps/*
 %{_iconsdir}/hicolor/22x22/actions/*
 %{_desktopdir}/*
+%dir %{_datadir}/%{name}/doc/C/
+%{_datadir}/%{name}/doc/C/*
+%lang(de) %{_datadir}/locale/de/*/*
+%lang(eu) %{_datadir}/locale/eu/*/*
+%lang(fi) %{_datadir}/locale/fi/*/*
+%lang(fr) %{_datadir}/locale/fr/*/*
+%lang(lt) %{_datadir}/locale/lt/*/*
+%lang(pl) %{_datadir}/locale/pl/*/*
+%lang(pt_BR) %{_datadir}/locale/pt_BR/*/*
+%lang(sk) %{_datadir}/locale/sk/*/*
 
 %files plugins
 %defattr(644,root,root,755)
