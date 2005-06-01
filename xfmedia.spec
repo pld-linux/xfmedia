@@ -16,10 +16,12 @@ URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 #BuildRequires:	automake >= 1:1.8
 %{?with_dbus:BuildRequires:	dbus-devel >= 0.23}
 BuildRequires:	gtk+2-devel >= 2:2.4.0
+BuildRequires:	libexo-devel >= 0.2
 BuildRequires:	libxfcegui4 >= 4.2.0
 BuildRequires:	libxfce4util >= 4.2.0
 BuildRequires:	xine-lib-devel
 Requires:	gtk+2 >= 2:2.4.0
+Requires:	libexo >= 0.2
 Requires:	libxfcegui4 >= 4.2.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -78,10 +80,12 @@ install -d $RPM_BUILD_ROOT
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
 
+%find_lang %{name}
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%files
+%files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README* TODO
 %config(noreplace) %verify(not md5 mtime size) /etc/xdg/%{name}/*
@@ -93,14 +97,6 @@ rm -rf $RPM_BUILD_ROOT
 %{_desktopdir}/*
 %dir %{_datadir}/%{name}/doc/C/
 %{_datadir}/%{name}/doc/C/*
-%lang(de) %{_datadir}/locale/de/*/*
-%lang(eu) %{_datadir}/locale/eu/*/*
-%lang(fi) %{_datadir}/locale/fi/*/*
-%lang(fr) %{_datadir}/locale/fr/*/*
-%lang(lt) %{_datadir}/locale/lt/*/*
-%lang(pl) %{_datadir}/locale/pl/*/*
-%lang(pt_BR) %{_datadir}/locale/pt_BR/*/*
-%lang(sk) %{_datadir}/locale/sk/*/*
 
 %files plugins
 %defattr(644,root,root,755)
