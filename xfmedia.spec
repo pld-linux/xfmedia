@@ -16,12 +16,12 @@ URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 #BuildRequires:	automake >= 1:1.8
 %{?with_dbus:BuildRequires:	dbus-devel >= 0.23}
 BuildRequires:	gtk+2-devel >= 2:2.4.0
-BuildRequires:	libexo-devel >= 0.2
-BuildRequires:	libxfcegui4 >= 4.2.0
-BuildRequires:	libxfce4util >= 4.2.0
+BuildRequires:	libexo-devel >= 0.3.0
+BuildRequires:	libxfcegui4-devel >= 4.2.0
+BuildRequires:	libxfce4util-devel >= 4.2.0
 BuildRequires:	xine-lib-devel
 Requires:	gtk+2 >= 2:2.4.0
-Requires:	libexo >= 0.2
+Requires:	libexo >= 0.3.0
 Requires:	libxfcegui4 >= 4.2.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -65,9 +65,9 @@ Xfmedia - pliki nag³ówkowe.
 %setup -q
 
 %build
-#%{__aclocal} -I m4
-#%{__autoconf}
-#%{__automake}
+#%%{__aclocal} -I m4
+#%%{__autoconf}
+#%%{__automake}
 %configure \
 	--disable-static \
 	%{!?with_dbus: --disable-dbus}
