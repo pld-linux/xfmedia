@@ -38,7 +38,7 @@ ale, jako ¿e jest oparty na xine, obs³uguje równie¿ pliki wideo.
 %package plugins
 Summary:	Xfmedia plugins
 Summary(pl):	Wtyczki dla Xfmedia
-Group:		X11/Application/Multimedia
+Group:		X11/Applications/Multimedia
 Requires:	%{name} = %{version}-%{release}
 
 %description plugins
