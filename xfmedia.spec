@@ -10,7 +10,7 @@ License:	GPL v2
 Group:		X11/Applications/Multimedia
 Source0:	http://spuriousinterrupt.org/projects/xfmedia/files/%{name}-%{version}.tar.bz2
 # Source0-md5:	5ab3d25703d16ab4074dc63e677d0367
-Source1:	%{name}.desktop
+Patch0:		%{name}-desktop.patch
 URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 #BuildRequires:	autoconf >= 2.50
 #BuildRequires:	automake >= 1:1.8
@@ -63,6 +63,7 @@ Xfmedia - pliki nag³ówkowe.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
 #%%{__aclocal} -I m4
@@ -75,7 +76,6 @@ Xfmedia - pliki nag³ówkowe.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
