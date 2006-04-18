@@ -5,12 +5,12 @@ Summary:	Xfmedia - lightweight media player based on the xine engine
 Summary(pl):	Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
 Name:		xfmedia
 Version:	0.8.0
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		X11/Applications/Multimedia
 Source0:	http://spuriousinterrupt.org/projects/xfmedia/files/%{name}-%{version}.tar.bz2
 # Source0-md5:	ed74adeeb58b3598726cbbcc58dba491
-Source1:	%{name}.desktop
+Patch0:		%{name}-desktop.patch
 URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 #BuildRequires:	autoconf >= 2.50
 #BuildRequires:	automake >= 1:1.8
@@ -63,6 +63,7 @@ Xfmedia - pliki nag³ówkowe.
 
 %prep
 %setup -q
+%patch -p1
 
 %build
 #%%{__aclocal} -I m4
@@ -75,10 +76,12 @@ Xfmedia - pliki nag³ówkowe.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT
+install -d $RPM_BUILD_ROOT%{_pixmapsdir}
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+cp -f {%{_iconsdir}/hicolor/48x48/apps,%{_pixmapsdir}}/xfmedia.png
 
 %find_lang %{name}
 
@@ -94,6 +97,7 @@ rm -rf $RPM_BUILD_ROOT
 %dir %{_libdir}/%{name}/plugins
 %{_iconsdir}/hicolor/48x48/apps/*
 %{_iconsdir}/hicolor/22x22/actions/*
+%{_pixmapsdir}/xfmedia.png
 %{_desktopdir}/*
 %dir %{_datadir}/%{name}/doc
 %{_datadir}/%{name}/doc/xfce.css
