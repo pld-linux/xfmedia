@@ -1,0 +1,51 @@
+--- src/trayicon.c.old	2005-10-06 00:18:19.000000000 +0200
++++ src/trayicon.c	2005-10-06 00:17:15.000000000 +0200
+@@ -101,13 +101,35 @@
+                 break;
+         }
+     } else if(evt->button == 3) {
+-        if(tray_icon->menu) {
++      if(tray_icon->menu) {
+             gtk_menu_popup(GTK_MENU(tray_icon->menu), NULL, NULL, NULL,
+                     NULL, evt->button, evt->time);
+         }
+         return TRUE;
+     }
+-    
++    return FALSE;
++}
++static gboolean
++xfmedia_tray_icon_button_scroll_cb(GtkWidget *w, GdkEventScroll *evt,
++        gpointer user_data)
++{
++    XfmediaTrayIcon *tray_icon = user_data;
++    XfmediaMainwin *mwin = tray_icon->mwin;
++    if(evt->direction == GDK_SCROLL_UP) {
++      gint volume = xfmedia_xine_get_param(mwin->xfx, XINE_PARAM_AUDIO_VOLUME);
++      volume += 2;
++      if(volume >100)
++	volume = 100;
++      xfmedia_xine_set_param(mwin->xfx, XINE_PARAM_AUDIO_VOLUME, volume);
++      return TRUE;
++    } else if(evt->direction == GDK_SCROLL_DOWN) {
++      gint volume = xfmedia_xine_get_param(mwin->xfx, XINE_PARAM_AUDIO_VOLUME);
++      volume -= 2;
++      if(volume <0)
++	volume = 0;
++      xfmedia_xine_set_param(mwin->xfx, XINE_PARAM_AUDIO_VOLUME, volume);
++      return TRUE;
++    }
+     return FALSE;
+ }
+ 
+@@ -159,7 +181,9 @@
+     gtk_container_add(GTK_CONTAINER(evtbox), img);
+     
+     g_signal_connect(G_OBJECT(evtbox), "button-press-event",
+-            G_CALLBACK(xfmedia_tray_icon_button_press_cb), cb_data);
++		     G_CALLBACK(xfmedia_tray_icon_button_press_cb), cb_data);
++    g_signal_connect(G_OBJECT(evtbox), "scroll-event",
++		     G_CALLBACK(xfmedia_tray_icon_button_scroll_cb), cb_data);
+     g_signal_connect(G_OBJECT(tray_icon), "destroy",
+             G_CALLBACK(xfmedia_tray_icon_destroy_cb), cb_data);
+     
