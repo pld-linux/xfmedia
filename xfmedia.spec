@@ -5,16 +5,18 @@ Summary:	Xfmedia - lightweight media player based on the xine engine
 Summary(pl):	Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
 Name:		xfmedia
 Version:	0.9.1
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		X11/Applications/Multimedia
 Source0:	http://spuriousinterrupt.org/projects/xfmedia/files/%{name}-%{version}.tar.bz2
 # Source0-md5:	5ab3d25703d16ab4074dc63e677d0367
 Patch0:		%{name}-desktop.patch
+Patch1:		%{name}-dbus_use_newapi.patch
+Patch2:		%{name}-trayicon-volume-scroll.patch
 URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 #BuildRequires:	autoconf >= 2.50
 #BuildRequires:	automake >= 1:1.8
-%{?with_dbus:BuildRequires:	dbus-devel >= 0.23}
+%{?with_dbus:BuildRequires:	dbus-devel >= 0.60}
 BuildRequires:	gtk+2-devel >= 2:2.4.0
 BuildRequires:	libexo-devel >= 0.3.0
 BuildRequires:	libxfcegui4-devel >= 4.2.0
@@ -64,6 +66,8 @@ Xfmedia - pliki nag³ówkowe.
 %prep
 %setup -q
 %patch0 -p1
+%patch1 -p0
+%patch2 -p0
 
 %build
 #%%{__aclocal} -I m4
