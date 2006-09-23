@@ -22,8 +22,10 @@ BuildRequires:	automake >= 1:1.8
 BuildRequires:	gtk+2-devel >= 2:2.4.0
 BuildRequires:	libexo-devel >= 0.3.0
 BuildRequires:	libtool
-BuildRequires:	libxfcegui4-devel >= 4.2.0
 BuildRequires:	libxfce4util-devel >= 4.2.0
+BuildRequires:	libxfcegui4-devel >= 4.2.0
+BuildRequires:	rpmbuild(macros) >= 1.311
+BuildRequires:	xfce4-dev-tools >= %{version}
 BuildRequires:	xine-lib-devel
 Requires(post,postun):	hicolor-icon-theme
 Requires:	gtk+2 >= 2:2.4.0
@@ -82,7 +84,10 @@ Xfmedia - pliki nag³ówkowe.
 %{__automake}
 %configure \
 	--disable-static \
-	%{!?with_dbus: --disable-dbus}
+	%{!?with_dbus: --disable-dbus} \
+	--x-includes=%{_includedir}/xorg \
+	--x-libraries=%{_prefix}/lib/X11
+
 %{__make}
 
 %install
@@ -105,8 +110,8 @@ rm -rf $RPM_BUILD_ROOT
 %files -f %{name}.lang
 %defattr(644,root,root,755)
 %doc AUTHORS ChangeLog NEWS README* TODO
-%dir /etc/xdg/%{name}
-%config(noreplace) %verify(not md5 mtime size) /etc/xdg/%{name}/*
+%dir %{_sysconfdir}/xdg/%{name}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/xdg/%{name}/*
 %attr(755,root,root) %{_bindir}/*
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
