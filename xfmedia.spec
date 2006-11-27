@@ -5,32 +5,31 @@
 Summary:	Xfmedia - lightweight media player based on the xine engine
 Summary(pl):	Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
 Name:		xfmedia
-Version:	0.9.1
-Release:	3
+Version:	0.9.2
+Release:	1
 License:	GPL v2
 Group:		X11/Applications/Multimedia
 Source0:	http://spuriousinterrupt.org/projects/xfmedia/files/%{name}-%{version}.tar.bz2
-# Source0-md5:	5ab3d25703d16ab4074dc63e677d0367
+# Source0-md5:	6eb8bd1f67201f829e0f45e733c02bd5
 Patch0:		%{name}-desktop.patch
-Patch1:		%{name}-dbus_use_newapi.patch
-Patch2:		%{name}-trayicon-volume-scroll.patch
-Patch3:		%{name}-link.patch
 URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake >= 1:1.8
-%{?with_dbus:BuildRequires:	dbus-devel >= 0.60}
-BuildRequires:	gtk+2-devel >= 2:2.4.0
+%{?with_dbus:BuildRequires:	dbus-glib-devel >= 0.31}
+BuildRequires:	gtk+2-devel >= 2:2.6.0
 BuildRequires:	libexo-devel >= 0.3.0
 BuildRequires:	libtool
 BuildRequires:	libxfce4util-devel >= 4.2.0
 BuildRequires:	libxfcegui4-devel >= 4.2.0
 BuildRequires:	rpmbuild(macros) >= 1.311
-BuildRequires:	xfce4-dev-tools >= %{version}
+BuildRequires:	startup-notification-devel >= 0.5
+BuildRequires:	taglib-devel
+BuildRequires:	xfce4-dev-tools >= 4.3.90.2
 BuildRequires:	xine-lib-devel
+BuildRequires:	xorg-lib-libXScrnSaver-devel
+Requires(post,postun):	gtk+2 >= 2:2.6.0
 Requires(post,postun):	hicolor-icon-theme
-Requires:	gtk+2 >= 2:2.4.0
 Requires:	libexo >= 0.3.0
-Requires:	libxfcegui4 >= 4.2.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -72,9 +71,6 @@ Xfmedia - pliki nag³ówkowe.
 %prep
 %setup -q
 %patch0 -p1
-%patch1 -p0
-%patch2 -p0
-%patch3 -p1
 
 %build
 %{__libtoolize}
@@ -84,7 +80,9 @@ Xfmedia - pliki nag³ówkowe.
 %{__automake}
 %configure \
 	--disable-static \
-	%{!?with_dbus: --disable-dbus} \
+	--%{?with_dbus:en}%{!?with_dbus:dis}able-dbus \
+	--enable-startup-notification \
+	--with-taglib \
 	--x-includes=%{_includedir}/xorg \
 	--x-libraries=%{_prefix}/lib/X11
 
@@ -95,6 +93,8 @@ rm -rf $RPM_BUILD_ROOT
 
 %{__make} install \
 	DESTDIR=$RPM_BUILD_ROOT
+
+rm -f $RPM_BUILD_ROOT%{_libdir}/xfmedia/plugins/xfmedia-infopipe.la
 
 %find_lang %{name}
 
@@ -131,4 +131,4 @@ rm -rf $RPM_BUILD_ROOT
 %files devel
 %defattr(644,root,root,755)
 %{_includedir}/%{name}
-%{_pkgconfigdir}/*
+%{_pkgconfigdir}/*.pc
