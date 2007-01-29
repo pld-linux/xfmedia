@@ -17,17 +17,16 @@ BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake >= 1:1.8
 %{?with_dbus:BuildRequires:	dbus-glib-devel >= 0.31}
 BuildRequires:	gtk+2-devel >= 2:2.6.0
-BuildRequires:	libexo-devel >= 0.3.0
+BuildRequires:	libexo-devel >= 0.3.2
 BuildRequires:	libtool
-BuildRequires:	libxfce4util-devel >= 4.2.0
-BuildRequires:	libxfcegui4-devel >= 4.2.0
+BuildRequires:	libxfce4util-devel >= 4.4.0
+BuildRequires:	libxfcegui4-devel >= 4.4.0
 BuildRequires:	rpmbuild(macros) >= 1.311
 BuildRequires:	startup-notification-devel >= 0.5
 BuildRequires:	taglib-devel
-BuildRequires:	xfce4-dev-tools >= 4.3.90.2
+BuildRequires:	xfce4-dev-tools >= 4.4.0
 BuildRequires:	xine-lib-devel
-BuildRequires:	xorg-lib-libXScrnSaver-devel
-Requires(post,postun):	gtk+2 >= 2:2.6.0
+Requires(post,postun):	gtk+2
 Requires(post,postun):	hicolor-icon-theme
 Requires:	libexo >= 0.3.0
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -82,9 +81,7 @@ Xfmedia - pliki nag³ówkowe.
 	--disable-static \
 	--%{?with_dbus:en}%{!?with_dbus:dis}able-dbus \
 	--enable-startup-notification \
-	--with-taglib \
-	--x-includes=%{_includedir}/xorg \
-	--x-libraries=%{_prefix}/lib/X11
+	--with-taglib
 
 %{__make}
 
