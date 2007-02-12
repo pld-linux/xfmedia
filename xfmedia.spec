@@ -3,7 +3,7 @@
 %bcond_without	dbus	# build without dbus support
 #
 Summary:	Xfmedia - lightweight media player based on the xine engine
-Summary(pl):	Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
+Summary(pl.UTF-8):   Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
 Name:		xfmedia
 Version:	0.9.2
 Release:	1
@@ -37,14 +37,14 @@ Xfmedia is a lightweight media player based on the xine engine. The
 GTK+ GUI focuses on playing and managing audio files, but, being based
 on xine, supports video as well.
 
-%description -l pl
+%description -l pl.UTF-8
 Xfmedia jest lekkim odtwarzaczem multimedialnym opartym o silnik xine.
-Interfejs GTK+ skupia siÍ na zarz±dzaniu i odtwarzaniu plikÛw audio,
-ale, jako øe jest oparty na xine, obs≥uguje rÛwnieø pliki wideo.
+Interfejs GTK+ skupia siƒô na zarzƒÖdzaniu i odtwarzaniu plik√≥w audio,
+ale, jako ≈ºe jest oparty na xine, obs≈Çuguje r√≥wnie≈º pliki wideo.
 
 %package plugins
 Summary:	Xfmedia plugins
-Summary(pl):	Wtyczki dla Xfmedia
+Summary(pl.UTF-8):   Wtyczki dla Xfmedia
 Group:		X11/Applications/Multimedia
 Requires:	%{name} = %{version}-%{release}
 
@@ -52,21 +52,21 @@ Requires:	%{name} = %{version}-%{release}
 Xfmedia plugins:
 - infopipe
 
-%description plugins -l pl
+%description plugins -l pl.UTF-8
 Wtyczki dla Xfmedia:
 - infopipe
 
 %package devel
 Summary:	Header files for Xfmedia
-Summary(pl):	Pliki nag≥Ûwkowe Xfmedia
+Summary(pl.UTF-8):   Pliki nag≈Ç√≥wkowe Xfmedia
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
 %description devel
 Xfmedia - header files.
 
-%description devel -l pl
-Xfmedia - pliki nag≥Ûwkowe.
+%description devel -l pl.UTF-8
+Xfmedia - pliki nag≈Ç√≥wkowe.
 
 %prep
 %setup -q
