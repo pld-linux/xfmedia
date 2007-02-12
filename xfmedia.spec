@@ -3,7 +3,7 @@
 %bcond_without	dbus	# build without dbus support
 #
 Summary:	Xfmedia - lightweight media player based on the xine engine
-Summary(pl.UTF-8):   Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
+Summary(pl.UTF-8):	Xfmedia - lekki odtwarzacz multimedialny oparty na silniku xine
 Name:		xfmedia
 Version:	0.9.2
 Release:	1
@@ -44,7 +44,7 @@ ale, jako że jest oparty na xine, obsługuje również pliki wideo.
 
 %package plugins
 Summary:	Xfmedia plugins
-Summary(pl.UTF-8):   Wtyczki dla Xfmedia
+Summary(pl.UTF-8):	Wtyczki dla Xfmedia
 Group:		X11/Applications/Multimedia
 Requires:	%{name} = %{version}-%{release}
 
@@ -58,7 +58,7 @@ Wtyczki dla Xfmedia:
 
 %package devel
 Summary:	Header files for Xfmedia
-Summary(pl.UTF-8):   Pliki nagłówkowe Xfmedia
+Summary(pl.UTF-8):	Pliki nagłówkowe Xfmedia
 Group:		X11/Development/Libraries
 Requires:	%{name} = %{version}-%{release}
 
