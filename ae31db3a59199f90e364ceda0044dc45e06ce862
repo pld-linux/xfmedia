@@ -1,0 +1,2 @@
+- fixed build by adding %{__intltoolize}
+- release 2
