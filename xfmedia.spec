@@ -17,6 +17,7 @@ BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake >= 1:1.8
 %{?with_dbus:BuildRequires:	dbus-glib-devel >= 0.31}
 BuildRequires:	gtk+2-devel >= 2:2.6.0
+BuildRequires:	intltool
 BuildRequires:	libexo-devel >= 0.3.0
 BuildRequires:	libtool
 BuildRequires:	libxfce4util-devel >= 4.2.0
