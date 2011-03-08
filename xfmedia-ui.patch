@@ -1,0 +1,634 @@
+diff -ur xfmedia-0.9.2/config.h.in xfmedia-0.9.2-ui/config.h.in
+--- xfmedia-0.9.2/config.h.in	2006-11-27 21:20:43.000000000 +0100
++++ xfmedia-0.9.2-ui/config.h.in	2011-03-08 12:51:04.550614005 +0100
+@@ -30,7 +30,7 @@
+ /* Define to 1 if you have the <errno.h> header file. */
+ #undef HAVE_ERRNO_H
+ 
+-/* Define if exo-0.3 >= 0.3.0 present */
++/* Define if exo-1 >= 0.6.0 present */
+ #undef HAVE_EXO
+ 
+ /* Define to 1 if you have the <fcntl.h> header file. */
+@@ -141,6 +141,10 @@
+ /* Define if XTEST is present */
+ #undef HAVE_XTESTEXTENSION
+ 
++/* Define to the sub-directory in which libtool stores uninstalled libraries.
++   */
++#undef LT_OBJDIR
++
+ /* Name of package */
+ #undef PACKAGE
+ 
+@@ -156,6 +160,9 @@
+ /* Define to the one symbol short name of this package. */
+ #undef PACKAGE_TARNAME
+ 
++/* Define to the home page for this package. */
++#undef PACKAGE_URL
++
+ /* Define to the version of this package. */
+ #undef PACKAGE_VERSION
+ 
+@@ -165,6 +172,28 @@
+ /* Define to 1 if you have the ANSI C header files. */
+ #undef STDC_HEADERS
+ 
++/* Enable extensions on AIX 3, Interix.  */
++#ifndef _ALL_SOURCE
++# undef _ALL_SOURCE
++#endif
++/* Enable GNU extensions on systems that have them.  */
++#ifndef _GNU_SOURCE
++# undef _GNU_SOURCE
++#endif
++/* Enable threading extensions on Solaris.  */
++#ifndef _POSIX_PTHREAD_SEMANTICS
++# undef _POSIX_PTHREAD_SEMANTICS
++#endif
++/* Enable extensions on HP NonStop.  */
++#ifndef _TANDEM_SOURCE
++# undef _TANDEM_SOURCE
++#endif
++/* Enable general extensions on Solaris.  */
++#ifndef __EXTENSIONS__
++# undef __EXTENSIONS__
++#endif
++
++
+ /* Version number of package */
+ #undef VERSION
+ 
+@@ -174,13 +203,6 @@
+ /* Define to 1 if the X Window System is missing or not being used. */
+ #undef X_DISPLAY_MISSING
+ 
+-/* Define to 1 if on AIX 3.
+-   System headers sometimes define this.
+-   We just want to avoid a redefinition error message.  */
+-#ifndef _ALL_SOURCE
+-# undef _ALL_SOURCE
+-#endif
+-
+ /* Define to 1 if on MINIX. */
+ #undef _MINIX
+ 
+diff -ur xfmedia-0.9.2/configure.ac xfmedia-0.9.2-ui/configure.ac
+--- xfmedia-0.9.2/configure.ac	2011-03-08 13:54:02.955352033 +0100
++++ xfmedia-0.9.2-ui/configure.ac	2011-03-08 12:51:04.551614005 +0100
+@@ -106,7 +106,8 @@
+ XDT_CHECK_PACKAGE([GLIB], [glib-2.0], [2.6.0])
+ XDT_CHECK_PACKAGE([GTK], [gtk+-2.0], [2.6.0])
+ XDT_CHECK_PACKAGE([LIBXFCE4UTIL], [libxfce4util-1.0], [4.2.0])
+-XDT_CHECK_PACKAGE([LIBXFCEGUI4], [libxfcegui4-1.0], [4.2.0])
++XDT_CHECK_PACKAGE([LIBXFCE4UI], [libxfce4ui-1], [4.8.0])
++XDT_CHECK_PACKAGE([LIBWNCK], [libwnck-1.0], [2.22])
+ XDT_CHECK_PACKAGE([LIBXINE], [libxine], [1.0.0])
+ 
+ dnl look for xine_plugins_garbage_collector().  need to check for a version
+diff -ur xfmedia-0.9.2/configure.ac.in xfmedia-0.9.2-ui/configure.ac.in
+--- xfmedia-0.9.2/configure.ac.in	2006-11-27 08:21:25.000000000 +0100
++++ xfmedia-0.9.2-ui/configure.ac.in	2011-03-08 12:51:04.587614005 +0100
+@@ -106,7 +106,8 @@
+ XDT_CHECK_PACKAGE([GLIB], [glib-2.0], [2.6.0])
+ XDT_CHECK_PACKAGE([GTK], [gtk+-2.0], [2.6.0])
+ XDT_CHECK_PACKAGE([LIBXFCE4UTIL], [libxfce4util-1.0], [4.2.0])
+-XDT_CHECK_PACKAGE([LIBXFCEGUI4], [libxfcegui4-1.0], [4.2.0])
++XDT_CHECK_PACKAGE([LIBXFCE4UI], [libxfce4ui-1], [4.8.0])
++XDT_CHECK_PACKAGE([LIBWNCK], [libwnck-1.0], [2.22])
+ XDT_CHECK_PACKAGE([LIBXINE], [libxine], [1.0.0])
+ 
+ dnl look for xine_plugins_garbage_collector().  need to check for a version
+diff -ur xfmedia-0.9.2/src/main.c xfmedia-0.9.2-ui/src/main.c
+--- xfmedia-0.9.2/src/main.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/main.c	2011-03-08 12:58:46.847614012 +0100
+@@ -54,9 +54,10 @@
+ #endif
+ 
+ #include <gtk/gtk.h>
++#include <gdk/gdkx.h>
+ 
+ #include <libxfce4util/libxfce4util.h>
+-#include <libxfcegui4/libxfcegui4.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #ifdef HAVE_LIBSTARTUP_NOTIFICATION
+ #define SN_API_NOT_YET_FROZEN 1
+@@ -188,7 +189,7 @@
+     if(ctx) {
+         if(!GTK_WIDGET_REALIZED(window))
+             gtk_widget_realize(window);
+-        sn_launchee_context_setup_window(ctx, GDK_WINDOW_XWINDOW(window->window));
++        sn_launchee_context_setup_window(ctx, GDK_WINDOW_XID(window->window));
+         sn_launchee_context_complete(ctx);
+         sn_launchee_context_unref(ctx);
+     }
+diff -ur xfmedia-0.9.2/src/mainwin.c xfmedia-0.9.2-ui/src/mainwin.c
+--- xfmedia-0.9.2/src/mainwin.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/mainwin.c	2011-03-08 12:51:04.589614005 +0100
+@@ -35,7 +35,7 @@
+ #include <gdk-pixbuf/gdk-pixdata.h>
+ 
+ #include <libxfce4util/libxfce4util.h>
+-#include <libxfcegui4/libxfcegui4.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #define EXO_API_SUBJECT_TO_CHANGE
+ #include <exo/exo.h>
+diff -ur xfmedia-0.9.2/src/mainwin-callbacks.c xfmedia-0.9.2-ui/src/mainwin-callbacks.c
+--- xfmedia-0.9.2/src/mainwin-callbacks.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/mainwin-callbacks.c	2011-03-08 12:51:04.591614005 +0100
+@@ -43,11 +43,7 @@
+ #include <gdk-pixbuf/gdk-pixdata.h>
+ 
+ #include <libxfce4util/libxfce4util.h>
+-#include <libxfcegui4/libxfcegui4.h>
+-
+-#if LIBXFCEGUI4_CHECK_VERSION(4, 3, 5)
+-#define xfce_about_dialog_new xfce_about_dialog_new_with_values
+-#endif
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #define EXO_API_SUBJECT_TO_CHANGE
+ #include <exo/exo.h>
+@@ -223,8 +219,8 @@
+                 GTK_STOCK_DIALOG_QUESTION, 
+                 _("You have edited this file's metadata."),
+                 _("Changes will be lost unless they are saved.  Do you wish to save changes?"),
+-                XFCE_CUSTOM_STOCK_BUTTON, _("_Discard Changes"), GTK_STOCK_NO, GTK_RESPONSE_NO,
+-                XFCE_CUSTOM_STOCK_BUTTON, _("_Save Changes"), GTK_STOCK_YES, GTK_RESPONSE_YES,
++                "custom-button-stock", _("_Discard Changes"), GTK_STOCK_NO, GTK_RESPONSE_NO,
++                "custom-button-stock", _("_Save Changes"), GTK_STOCK_YES, GTK_RESPONSE_YES,
+                 NULL);
+         if(resp == GTK_RESPONSE_YES)
+             xfmedia_tag_flush(tag_info);
+@@ -1916,74 +1912,53 @@
+     }
+ }
+ 
+-static const struct
+-{
+-    gchar *name;
+-    gchar *email;
+-    gchar *langcode;
+-} translator_list[] = {
+-    { "Bernhard Walle", "bernhard.walle@gmx.de", "de" },
+-    { "Piarres Beobide", "pi@beobide.net", "eu" },
+-    { "Jaime Buffery", "nestu@lunar-linux.org", "es" },
+-    { "Jari Rahkonen", "jari.rahkonen@pp1.inet.fi", "fi" },
+-    { "St\303\251phane Roy", "sroy@j2n.net", "fr" },
+-    { "Collet Etienne", "xanax@no-log.org", "fr" },
+-    { "lerouge", "lerouge@gmail.com", "fr" },
+-    { "Ankit Patel", "ankit644@yahoo.com", "gu" },
+-    { "Atilla Szerv\303\241c", "sas@321.hu", "hu" },
+-    { "Daichi Kawahata", "daichi@xfce.org", "ja" },
+-    { "Rimas Kudelis", "rg@akl.lt", "lt" },
+-    { "Robert Kurowski", "koorek@o2.pl", "pl" },
+-    { "Tomas Schertel", "tschertel@gmail.com", "pt_BR" },
+-    { "Juraz Brosz", "juro@jurajbrosz.info", "sk" },
+-    { "Maxim Dziumanenko", "mvd@softprom.kiev.ua", "uk" },
+-    { "Phan Vinh Thinh", "teppi@vnlinux.org", "vi" },
+-    { "Sheng Feng Zhou", "zhoushengfeng@highpoint-tech.com.cn", "zh_CN" },
+-    { "Hydonsingore Cia", "hydonsingore@mail.educities.edu.tw", "zh_TW" },
+-    { NULL, NULL, NULL }
+-};
++static const gchar *translators =
++    "Bernhard Walle <bernhard.walle@gmx.de> de\n"
++    "Piarres Beobide <pi@beobide.net> eu\n"
++    "Jaime Buffery <nestu@lunar-linux.org> es\n"
++    "Jari Rahkonen <jari.rahkonen@pp1.inet.fi> fi\n"
++    "St\303\251phane Roy <sroy@j2n.net> fr\n"
++    "Collet Etienne <xanax@no-log.org> fr\n"
++    "lerouge <lerouge@gmail.com> fr\n"
++    "Ankit Patel <ankit644@yahoo.com> gu\n"
++    "Atilla Szerv\303\241c <sas@321.hu> hu\n"
++    "Daichi Kawahata <daichi@xfce.org> ja\n"
++    "Rimas Kudelis <rg@akl.lt> lt\n"
++    "Robert Kurowski <koorek@o2.pl> pl\n"
++    "Tomas Schertel <tschertel@gmail.com> pt_BR\n"
++    "Juraz Brosz <juro@jurajbrosz.info> sk\n"
++    "Maxim Dziumanenko <mvd@softprom.kiev.ua> uk\n"
++    "Phan Vinh Thinh <teppi@vnlinux.org> vi\n"
++    "Sheng Feng Zhou <zhoushengfeng@highpoint-tech.com.cn> zh_CN\n"
++    "Hydonsingore Cia <hydonsingore@mail.educities.edu.tw> zh_TW\n";
+ 
++static const gchar *auth[] = { "Brian Tarricone <bjt23@cornell.edu> Original Author/Maintainer",
++	                       NULL };
+ void
+ xfmedia_about_cb(GtkWidget *w, gpointer user_data)
+ {
+     XfmediaMainwin *mwin = user_data;
+-    XfceAboutInfo *ainfo;
+-    static GtkWidget *dlg = NULL;
+     GtkWidget *toplevel = NULL;
+-    gint i;
+-    gchar *TRANSLATOR = _("Translator"), translator_str[1024];
+-    
+-    if(dlg) {
+-        gtk_window_present(GTK_WINDOW(dlg));
+-        return;
+-    }
+     
+     if(w)
+         toplevel = gtk_widget_get_toplevel(w);
+     if(!toplevel)
+         toplevel = mwin->window;
+-    
+-    ainfo = xfce_about_info_new("Xfmedia", VERSION " (" REVISION ")",
+-            _("Xfmedia is a lightweight media player,\nbased on the xine engine"),
+-            XFCE_COPYRIGHT_TEXT("2004-2005", "Brian Tarricone"), XFCE_LICENSE_GPL);
+-    xfce_about_info_set_homepage(ainfo, WEBSITE);
+-    
+-    xfce_about_info_add_credit(ainfo, "Brian Tarricone", "bjt23@cornell.edu",
+-            _("Original Author/Maintainer"));
+-    
+-    for(i = 0; translator_list[i].name; i++) {
+-        g_snprintf(translator_str, 1024, "%s (%s)", TRANSLATOR,
+-                translator_list[i].langcode);
+-        xfce_about_info_add_credit(ainfo, translator_list[i].name,
+-                translator_list[i].email, translator_str);
+-    }
+-    
+-    dlg = xfce_about_dialog_new(GTK_WINDOW(toplevel), ainfo, NULL);
+-    g_signal_connect(G_OBJECT(dlg), "response",
+-            G_CALLBACK(gtk_widget_destroy), NULL);
+-    g_signal_connect_swapped(G_OBJECT(dlg), "destroy",
+-            G_CALLBACK(xfmedia_widget_zero_pointer), &dlg);
+-    gtk_widget_show_all(dlg);
++
++#if !GTK_CHECK_VERSION (2, 18, 0)
++    gtk_about_dialog_set_email_hook (exo_gtk_url_about_dialog_hook, NULL, NULL);
++    gtk_about_dialog_set_url_hook (exo_gtk_url_about_dialog_hook, NULL, NULL);
++#endif
++    gtk_show_about_dialog(GTK_WINDOW (toplevel),
++                          "program-name", "Xfmedia",
++                          "license", xfce_get_license_text (XFCE_LICENSE_TEXT_GPL),
++                          "version", VERSION " (" REVISION ")",
++                          "comments", _("Xfmedia is a lightweight media player,\nbased on the xine engine"),
++                          "website", WEBSITE,
++                          "copyright", "2004-2005 Brian Tarricone",
++                          "authors", auth, 
++                          "translator-credits", translators,
++                          NULL);
+ }
+ 
+ gboolean
+diff -ur xfmedia-0.9.2/src/Makefile.am xfmedia-0.9.2-ui/src/Makefile.am
+--- xfmedia-0.9.2/src/Makefile.am	2006-11-27 15:44:03.000000000 +0100
++++ xfmedia-0.9.2-ui/src/Makefile.am	2011-03-08 12:55:40.931613981 +0100
+@@ -51,9 +51,11 @@
+ 	-DLOCALEDIR=\"$(localedir)\" \
+ 	-I$(top_srcdir) \
+ 	-I$(top_srcdir)/xfmedia \
++	-DWNCK_I_KNOW_THIS_IS_UNSTABLE \
+ 	@LIBX11_CFLAGS@ \
+ 	@LIBXFCE4UTIL_CFLAGS@ \
+-	@LIBXFCEGUI4_CFLAGS@ \
++	@LIBXFCE4UI_CFLAGS@ \
++	@LIBWNCK_CFLAGS@ \
+ 	@LIBSTARTUP_NOTIFICATION_CFLAGS@ \
+ 	@GTHREAD_CFLAGS@ \
+ 	@GTK_CFLAGS@ \
+@@ -72,7 +74,8 @@
+ 	@LIBX11_LIBS@ \
+ 	@GTHREAD_LIBS@ \
+ 	@LIBXFCE4UTIL_LIBS@ \
+-	@LIBXFCEGUI4_LIBS@ \
++	@LIBXFCE4UI_LIBS@ \
++	@LIBWNCK_LIBS@ \
+ 	@EXO_LIBS@ \
+ 	@LIBSTARTUP_NOTIFICATION_LIBS@ \
+ 	@LIBXINE_LIBS@ \
+diff -ur xfmedia-0.9.2/src/mediamarks.c xfmedia-0.9.2-ui/src/mediamarks.c
+--- xfmedia-0.9.2/src/mediamarks.c	2011-03-08 13:54:02.955352033 +0100
++++ xfmedia-0.9.2-ui/src/mediamarks.c	2011-03-08 12:51:04.595614005 +0100
+@@ -58,7 +58,7 @@
+ #endif
+ #include <gdk/gdkkeysyms.h>
+ #include <gtk/gtk.h>
+-#include <libxfcegui4/libxfcegui4.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #define EXO_API_SUBJECT_TO_CHANGE
+ #include <exo/exo.h>
+diff -ur xfmedia-0.9.2/src/playlist.c xfmedia-0.9.2-ui/src/playlist.c
+--- xfmedia-0.9.2/src/playlist.c	2011-03-08 13:54:02.957352033 +0100
++++ xfmedia-0.9.2-ui/src/playlist.c	2011-03-08 13:01:33.789501006 +0100
+@@ -53,7 +53,7 @@
+ #define GTK_TREE_SORTABLE_UNSORTED_SORT_COLUMN_ID (-2)
+ #endif
+ 
+-#include <libxfcegui4/libxfcegui4.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #define EXO_API_SUBJECT_TO_CHANGE
+ #include <exo/exo.h>
+@@ -573,7 +573,7 @@
+     
+     return xfce_message_dialog(parent, "Xfmedia", GTK_STOCK_DIALOG_WARNING,
+             primary, secondary,
+-            XFCE_CUSTOM_STOCK_BUTTON, _("Do_n't save"),
++            "custom-button-stock", _("Do_n't save"),
+                 GTK_STOCK_NO, GTK_RESPONSE_NO,
+             GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+             GTK_STOCK_SAVE, GTK_RESPONSE_YES, NULL);
+@@ -1510,13 +1510,13 @@
+     
+     gtk_icon_size_lookup(GTK_ICON_SIZE_SMALL_TOOLBAR, &iw, &ih);
+     
+-    pix = xfce_themed_icon_load("media-playlist-shuffle", iw);
++    pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), "media-playlist-shuffle", iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+     if(!pix)
+-        pix = xfce_themed_icon_load("media-shuffle", iw);
++        pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), "media-shuffle", iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+     if(!pix)
+-        pix = xfce_themed_icon_load("stock_media-shuffle", iw);
++        pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), "stock_media-shuffle", iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+     if(!pix)
+-        pix = xfce_themed_icon_load("xfmedia-shuffle", iw);
++    pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), "xfmedia-shuffle", iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+     if(pix) {
+         img = gtk_image_new_from_pixbuf(pix);
+         gtk_widget_show(img);
+@@ -1531,13 +1531,13 @@
+             G_CALLBACK(xfmedia_playlist_shuffle_toggle_cb), plist);
+     gtk_tooltips_set_tip(ttips, btn, _("Randomize play order"), NULL);
+     
+-    pix = xfce_themed_icon_load("media-playlist-repeat", iw);
++    pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), "media-playlist-repeat", iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+     if(!pix)
+-        pix = xfce_themed_icon_load("repeat", iw);
++        pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), "repeat", iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+     if(!pix)
+-        pix = xfce_themed_icon_load("stock_repeat", iw);
++        pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), "stock_repeat", iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+     if(!pix)
+-        pix = xfce_themed_icon_load("xfmedia-repeat", iw);
++        pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), "xfmedia-repeat", iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+     if(pix) {
+         img = gtk_image_new_from_pixbuf(pix);
+         gtk_widget_show(img);
+diff -ur xfmedia-0.9.2/src/settings.c xfmedia-0.9.2-ui/src/settings.c
+--- xfmedia-0.9.2/src/settings.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/settings.c	2011-03-08 12:51:04.597614005 +0100
+@@ -55,7 +55,7 @@
+ #endif
+ 
+ #include <libxfce4util/libxfce4util.h>
+-#include <libxfcegui4/libxfcegui4.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #include <xfmedia/xfmedia-settings.h>
+ #include "xfmedia-common.h"
+diff -ur xfmedia-0.9.2/src/settings-dialog.c xfmedia-0.9.2-ui/src/settings-dialog.c
+--- xfmedia-0.9.2/src/settings-dialog.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/settings-dialog.c	2011-03-08 12:51:04.598614005 +0100
+@@ -38,7 +38,7 @@
+ #include <gtk/gtk.h>
+ 
+ #include <libxfce4util/libxfce4util.h>
+-#include <libxfcegui4/libxfcegui4.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #define EXO_API_SUBJECT_TO_CHANGE
+ #include <exo/exo.h>
+diff -ur xfmedia-0.9.2/src/trayicon.c xfmedia-0.9.2-ui/src/trayicon.c
+--- xfmedia-0.9.2/src/trayicon.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/trayicon.c	2011-03-08 13:47:11.275352021 +0100
+@@ -24,8 +24,8 @@
+ #include <gdk/gdkx.h>
+ #include <gtk/gtk.h>
+ 
+-#include <libxfcegui4/libxfcegui4.h>
+-#include <libxfcegui4/netk-trayicon.h>
++#include <libwnck/libwnck.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #include "trayicon.h"
+ #include "xfmedia-common.h"
+@@ -42,15 +42,13 @@
+ 
+ struct _XfmediaTrayIcon
+ {
+-    GtkWidget *tray_icon;
+-    GtkWidget *event_box;
++    GtkStatusIcon *tray_icon;
+     GtkMenu *menu;
+-    GtkTooltips *tooltip;
+     gchar *tooltip_str;
+     XfmediaMainwin *mwin;
+ };
+ 
+-static GtkWidget *_xfmedia_tray_icon_create(GdkScreen *gscreen, gpointer cb_data);
++static GtkStatusIcon *_xfmedia_tray_icon_create(GdkScreen *gscreen, gpointer cb_data);
+ 
+ static gboolean
+ xfmedia_tray_icon_button_press_cb(GtkWidget *w, GdkEventButton *evt,
+@@ -61,21 +59,21 @@
+     
+     if(evt->button == 1) {
+         if(mwin->is_iconified) {
+-            NetkWindow *nwin;
+-            NetkScreen *nscr;
+-            NetkWorkspace *nws;
++            WnckWindow *wwin;
++            WnckScreen *wscr;
++            WnckWorkspace *wws;
+             
+             gtk_window_deiconify(GTK_WINDOW(mwin->window));
+             
+             /* this next line is lame and probably won't work on multihead, but
+              * netk_window_get() will fail if we don't first force an update */
+-            netk_screen_force_update(netk_screen_get_default());
+-            nwin = netk_window_get(GDK_WINDOW_XID(mwin->window->window));
+-            if(nwin) {
+-                nscr = netk_window_get_screen(nwin);
+-                netk_screen_force_update(nscr);
+-                nws = netk_screen_get_active_workspace(nscr);
+-                netk_window_move_to_workspace(nwin, nws);
++            wnck_screen_force_update(wnck_screen_get_default());
++            wwin = wnck_window_get(GDK_WINDOW_XID(mwin->window->window));
++            if(wwin) {
++                wscr = wnck_window_get_screen(wwin);
++                wnck_screen_force_update(wscr);
++                wws = wnck_screen_get_active_workspace(wscr);
++                wnck_window_move_to_workspace(wwin, wws);
+             }
+         } else
+             gtk_window_iconify(GTK_WINDOW(mwin->window));
+@@ -149,53 +147,21 @@
+     
+     tray_icon->tray_icon = _xfmedia_tray_icon_create(gscreen, tray_icon);
+     if(tray_icon->tooltip_str) {
+-        gtk_tooltips_set_tip(tray_icon->tooltip, tray_icon->event_box,
+-                tray_icon->tooltip_str, NULL);
++        gtk_status_icon_set_tooltip(tray_icon->tray_icon, tray_icon->tooltip_str);
+     }
+ }
+ 
+-static GtkWidget *
++static GtkStatusIcon *
+ _xfmedia_tray_icon_create(GdkScreen *gscreen, gpointer cb_data)
+ {
+-    GtkWidget *tray_icon, *evtbox, *img;
+-    GdkPixbuf *pix, *tmp;
+-    gint iw, ih;
+-    
+-    tray_icon = netk_tray_icon_new(GDK_SCREEN_XSCREEN(gscreen));
+-    
+-    evtbox = gtk_event_box_new();
+-    gtk_widget_add_events(evtbox, GDK_BUTTON_PRESS);
+-    gtk_widget_show(evtbox);
+-    gtk_container_add(GTK_CONTAINER(tray_icon), evtbox);
+-    
+-    gtk_icon_size_lookup(GTK_ICON_SIZE_LARGE_TOOLBAR, &iw, &ih);
+-    pix = xfce_themed_icon_load("xfmedia", iw);
+-    if(!pix) {
+-        tmp = gdk_pixbuf_from_pixdata(&xfmedia_icon, TRUE, NULL);
+-        if(tmp && gdk_pixbuf_get_width(tmp) == iw && gdk_pixbuf_get_height(tmp) == ih)
+-            pix = tmp;
+-        else if(tmp) {
+-            pix = gdk_pixbuf_scale_simple(tmp, iw, ih, GDK_INTERP_BILINEAR);
+-            g_object_unref(G_OBJECT(tmp));
+-        } else {
+-            pix = gdk_pixbuf_new(GDK_COLORSPACE_RGB, TRUE, 8, iw, ih);
+-            gdk_pixbuf_fill(pix, 0);
+-        }
+-    }
+-    
+-    img = gtk_image_new_from_pixbuf(pix);
+-    g_object_unref(G_OBJECT(pix));
+-    gtk_widget_show(img);
+-    gtk_container_add(GTK_CONTAINER(evtbox), img);
++    GtkStatusIcon *tray_icon;
++
++    tray_icon = gtk_status_icon_new_from_icon_name ("xfmedia");
+     
+-    g_signal_connect(G_OBJECT(evtbox), "button-press-event",
++    g_signal_connect(G_OBJECT(tray_icon), "button-press-event",
+                      G_CALLBACK(xfmedia_tray_icon_button_press_cb), cb_data);
+-    g_signal_connect(G_OBJECT(evtbox), "scroll-event",
++    g_signal_connect(G_OBJECT(tray_icon), "scroll-event",
+                      G_CALLBACK(xfmedia_tray_icon_button_scroll_cb), cb_data);
+-    g_signal_connect(G_OBJECT(tray_icon), "destroy",
+-                     G_CALLBACK(xfmedia_tray_icon_destroy_cb), cb_data);
+-    
+-    gtk_widget_show(tray_icon);
+     
+     return tray_icon;
+ }
+@@ -209,12 +175,8 @@
+     
+     tray_icon = g_new0(XfmediaTrayIcon, 1);
+     tray_icon->tray_icon = _xfmedia_tray_icon_create(gscreen, tray_icon);
+-    tray_icon->event_box = gtk_bin_get_child(GTK_BIN(tray_icon->tray_icon));
+     tray_icon->mwin = mwin;
+     tray_icon->menu = menu;
+-    tray_icon->tooltip = gtk_tooltips_new();
+-    g_object_ref(G_OBJECT(tray_icon->tooltip));
+-    gtk_object_sink(GTK_OBJECT(tray_icon->tooltip));
+     
+     return tray_icon;
+ }
+@@ -227,22 +189,21 @@
+     if(tray_icon->tooltip_str)
+         g_free(tray_icon->tooltip_str);
+     tray_icon->tooltip_str = g_strdup(tip);
+-    
+-    gtk_tooltips_set_tip(tray_icon->tooltip, tray_icon->event_box, tip, NULL);
++
++    gtk_status_icon_set_tooltip (tray_icon->tray_icon, tip);
+ }
+ 
+ void
+ xfmedia_tray_icon_destroy(XfmediaTrayIcon *tray_icon)
+ {
+-    g_return_if_fail(tray_icon && NETK_IS_TRAY_ICON(tray_icon->tray_icon));
++    g_return_if_fail(tray_icon);
+     
+     g_signal_handlers_disconnect_by_func(G_OBJECT(tray_icon->tray_icon),
+             xfmedia_tray_icon_destroy_cb, tray_icon);
+     
+-    g_object_unref(G_OBJECT(tray_icon->tooltip));
+     if(tray_icon->tooltip_str)
+         g_free(tray_icon->tooltip_str);
+     
+-    gtk_widget_destroy(tray_icon->tray_icon);
++    g_object_unref (G_OBJECT (tray_icon->tray_icon));
+     g_free(tray_icon);
+ }
+diff -ur xfmedia-0.9.2/src/xfmedia-common.c xfmedia-0.9.2-ui/src/xfmedia-common.c
+--- xfmedia-0.9.2/src/xfmedia-common.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/xfmedia-common.c	2011-03-08 13:04:34.265693993 +0100
+@@ -40,7 +40,7 @@
+ #include <gtk/gtk.h>
+ 
+ #include <libxfce4util/libxfce4util.h>
+-#include <libxfcegui4/libxfcegui4.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #include <xine.h>
+ 
+@@ -110,7 +110,7 @@
+         img = gtk_image_new_from_stock(icon, GTK_ICON_SIZE_BUTTON);
+         if(!img || gtk_image_get_storage_type(GTK_IMAGE(img)) == GTK_IMAGE_EMPTY) {
+             gtk_icon_size_lookup(GTK_ICON_SIZE_BUTTON, &iw, &ih);
+-            pix = xfce_themed_icon_load(icon, iw);
++            pix = gtk_icon_theme_load_icon ( gtk_icon_theme_get_default(), icon, iw, GTK_ICON_LOOKUP_GENERIC_FALLBACK, NULL);
+             if(pix) {
+                 if(img)
+                     gtk_image_set_from_pixbuf(GTK_IMAGE(img), pix);
+@@ -667,13 +667,7 @@
+ GtkWidget *
+ xfmedia_create_framebox(const gchar *title, GtkWidget **frame_bin)
+ {
+-#if LIBXFCEGUI4_CHECK_VERSION(4, 3, 4)
+-    return xfce_create_framebox(title, frame_bin);
+-#else
+-    GtkWidget *frame = xfce_framebox_new(title, TRUE);
+-    *frame_bin = XFCE_FRAMEBOX(frame)->hbox;
+-    return frame;
+-#endif
++    return xfce_gtk_frame_box_new(title, frame_bin);
+ }
+ 
+ gchar *
+diff -ur xfmedia-0.9.2/src/xfmedia-keybindings.c xfmedia-0.9.2-ui/src/xfmedia-keybindings.c
+--- xfmedia-0.9.2/src/xfmedia-keybindings.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/xfmedia-keybindings.c	2011-03-08 12:51:04.600614005 +0100
+@@ -30,7 +30,7 @@
+ #include <gdk/gdkx.h>
+ 
+ #include <libxfce4util/libxfce4util.h>
+-#include <libxfcegui4/libxfcegui4.h>
++#include <libxfce4ui/libxfce4ui.h>
+ 
+ #include "xfmedia-common.h"
+ #include "xfmedia-internal.h"
+diff -ur xfmedia-0.9.2/src/xfmedia-remote.c xfmedia-0.9.2-ui/src/xfmedia-remote.c
+--- xfmedia-0.9.2/src/xfmedia-remote.c	2006-11-27 08:21:23.000000000 +0100
++++ xfmedia-0.9.2-ui/src/xfmedia-remote.c	2011-03-08 12:51:04.601614005 +0100
+@@ -308,7 +308,7 @@
+         session_id = xfmedia_remote_client_send_command(-1, XFMEDIA_REMOTE_IS_RUNNING);
+         if(session_id < 0) {
+             /* can't use xfce_exec() here because i don't want to have to
+-             * pull in libxfcegui4 */
++             * pull in libxfce4ui */
+             if(!g_spawn_command_line_async(BINDIR "/xfmedia", NULL)
+                    && !g_spawn_command_line_async("xfmedia", NULL))
+             {
+diff -ur xfmedia-0.9.2/xfmedia/xfmedia-plugin.pc.in xfmedia-0.9.2-ui/xfmedia/xfmedia-plugin.pc.in
+--- xfmedia-0.9.2/xfmedia/xfmedia-plugin.pc.in	2006-11-27 08:21:24.000000000 +0100
++++ xfmedia-0.9.2-ui/xfmedia/xfmedia-plugin.pc.in	2011-03-08 12:51:04.602614005 +0100
+@@ -5,7 +5,7 @@
+ 
+ Name: xfmedia-plugin
+ Description: Plugin interface for Xfmedia
+-Requires: gthread-2.0 gmodule-2.0 gdk-2.0 gtk+-2.0 libxfcegui4-1.0
++Requires: gthread-2.0 gmodule-2.0 gdk-2.0 gtk+-2.0 libxfce4ui-1
+ Version: @VERSION@
+-Libs: @GTHREAD_LIBS@ @GMODULE_LIBS@ @LIBXFCEGUI4_LIBS@
+-Cflags: @GTHREAD_CFLAGS@ @GMODULE_CFLAGS@ @LIBXFCEGUI4_CFLAGS@ -I${includedir}/xfmedia
++Libs: @GTHREAD_LIBS@ @GMODULE_LIBS@ @LIBXFCE4UI_LIBS@
++Cflags: @GTHREAD_CFLAGS@ @GMODULE_CFLAGS@ @LIBXFCE4UI_CFLAGS@ -I${includedir}/xfmedia
