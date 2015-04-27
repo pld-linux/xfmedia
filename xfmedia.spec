@@ -15,7 +15,7 @@ Patch0:		%{name}-desktop.patch
 Patch1:		%{name}-exo-1.patch
 Patch2:		%{name}-ui.patch
 Patch3:		%{name}-xine-1.2.0.patch
-URL:		http://spuriousinterrupt.org/projects/xfmedia/index.php
+URL:		https://www.spurint.org/projects/xfmedia/
 BuildRequires:	autoconf >= 2.50
 BuildRequires:	automake >= 1:1.8
 %{?with_dbus:BuildRequires:	dbus-glib-devel >= 0.31}
